@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice Bot Script Generator</title>
+<meta name="description" content="Generate a voice bot script with greeting, main prompt, fallback, and closing lines for your use case.">
+<meta name="google-site-verification" content="REPLACE_WITH_YOUR_VERIFICATION_CODE">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0f12;color:#d7dbe0;font-family:'JetBrains Mono',monospace;line-height:1.6;padding:24px 16px 60px}
+.wrap{max-width:760px;margin:0 auto}
+h1{font-size:22px;color:#7ee787;margin-bottom:6px}
+.subtitle{color:#8b949e;font-size:14px;margin-bottom:24px}
+.panel{background:#14171a;border:1px solid #2a2f36;border-radius:6px;padding:18px;margin-bottom:20px}
+.panel h2{font-size:15px;color:#58a6ff;margin-bottom:12px}
+label{display:block;font-size:12px;color:#8b949e;margin:10px 0 4px}
+input[type=text],select{width:100%;background:#0a0c0e;border:1px solid #2a2f36;border-radius:4px;color:#d7dbe0;font-family:'JetBrains Mono',monospace;font-size:13px;padding:10px}
+.row-2{display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:560px){.row-2{grid-template-columns:1fr 1fr;gap:12px}}
+.btn{background:#238636;color:#fff;border:none;border-radius:4px;padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;cursor:pointer;margin-right:8px;margin-top:12px}
+.btn.secondary{background:#21262d;border:1px solid #2a2f36}
+.output{background:#0a0c0e;border:1px solid #2a2f36;border-radius:4px;padding:14px;font-size:13px;color:#d7dbe0;white-space:pre-wrap;margin-top:12px}
+article{font-size:13px;color:#a9b1bb;margin-top:26px}
+article h2{font-size:15px;color:#58a6ff;margin:16px 0 8px}
+article p{margin-bottom:8px}
+footer{text-align:center;font-size:11px;color:#4a5158;margin-top:34px}
+</style></head>
+<body><div class="wrap">
+<h1>Voice Bot Script Generator</h1>
+<p class="subtitle">Pick a use case, fill in details, and get a full voice bot script.</p>
+<div class="panel">
+<div class="row-2">
+<div><label>Business name</label><input type="text" id="bizName" value="Your Business"></div>
+<div><label>Use case</label><select id="useCase"><option value="support">Customer Support</option><option value="appointment">Appointment Booking</option><option value="orderstatus">Order Status Lookup</option></select></div>
+</div>
+<label>Hold/transfer phrase for a human agent</label>
+<input type="text" id="transferPhrase" value="one of our team members">
+<button class="btn" id="generateBtn">Generate</button>
+<button class="btn secondary" id="copyBtn">Copy</button>
+<div class="output" id="output"></div>
+</div>
+<article><h2>Voice-Specific Writing Tips</h2><p>Voice scripts should use shorter sentences than chat scripts, avoid special characters like slashes or asterisks that text-to-speech engines mispronounce, and always give a way to reach a human, since callers cannot scroll back to re-read a menu.</p></article>
+<footer>Client-side tool. Nothing you enter here is stored or sent anywhere.</footer>
+</div>
+<script>
+var CASES={
+  support: { greeting: 'Thanks for calling {biz}. How can I help you today?', main: 'You can say things like "billing question," "technical issue," or "something else."', fallback: "Sorry, I didn't catch that. Could you say that again in a few words?", closing: 'Thanks for calling {biz}. Have a great day.' },
+  appointment: { greeting: 'Thanks for calling {biz}. I can help you book an appointment.', main: 'What day works best for you? You can say a day like "Tuesday" or "next Friday."', fallback: "I didn't quite get that. Could you tell me the day again?", closing: 'Your appointment is set. Thanks for calling {biz}, see you soon.' },
+  orderstatus: { greeting: 'Thanks for calling {biz} order status line.', main: 'Please say or enter your order number now.', fallback: "I couldn't find that order number. Let's try that again.", closing: 'Thanks for calling {biz}. Have a great day.' }
+};
+function generate(){
+  var biz=document.getElementById('bizName').value.trim()||'Your Business';
+  var useCase=document.getElementById('useCase').value;
+  var transfer=document.getElementById('transferPhrase').value.trim()||'a team member';
+  var c=CASES[useCase];
+  var text='GREETING:\n'+c.greeting.split('{biz}').join(biz)+'\n\n';
+  text+='MAIN PROMPT:\n'+c.main+'\n\n';
+  text+='FALLBACK (no match / silence):\n'+c.fallback+'\n\n';
+  text+='ESCALATION:\nLet me connect you with '+transfer+'. Please hold.\n\n';
+  text+='CLOSING:\n'+c.closing.split('{biz}').join(biz);
+  document.getElementById('output').innerHTML=text;
+}
+function copyOutput(){
+  var text=document.getElementById('output').innerText||document.getElementById('output').textContent;
+  if(navigator.clipboard){ navigator.clipboard.writeText(text); }
+}
+document.getElementById('generateBtn').addEventListener('click',generate);
+document.getElementById('copyBtn').addEventListener('click',copyOutput);
+generate();
+</script>
+</body></html>
